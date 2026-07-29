@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply font-body antialiased;
+    background-image: radial-gradient(circle at 50% -10%, rgba(140, 30, 60, 0.10), transparent 60%);
+  }
+  [dir='rtl'] body {
+    @apply font-arabic;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-midnight-800/40 backdrop-blur-glass border border-white/10 shadow-glass rounded-2xl;
+  }
+}

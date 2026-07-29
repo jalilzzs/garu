@@ -1,0 +1,10 @@
+{
+  "app_title": "Loup-Garou Online",
+  "lobby": "Lobby",
+  "day_phase": "Day",
+  "night_phase": "Night",
+  "villagers_chat": "Village Chat",
+  "wolves_chat": "Wolf Chat",
+  "dead_chat": "Spirit Chat",
+  "guest_login": "Play as Guest"
+}

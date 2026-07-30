@@ -1,4 +1,4 @@
- import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const API_BASE_URL = 'https://loup-garou-kqz6.onrender.com';
 const AuthContext = createContext(null);
@@ -15,9 +15,16 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` } });
+      const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${t}`,
+        },
+      });
+
       if (!res.ok) throw new Error('session expired');
+
       const data = await res.json();
       setUser(data.user);
     } catch {
@@ -35,36 +42,29 @@ export function AuthProvider({ children }) {
 
   const loginAsGuest = useCallback(async (displayName) => {
     const res = await fetch(`${API_BASE_URL}/api/auth/guest`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ displayName }),
-});
-
-console.log("STATUS:", res.status);
-
-const data = await res.json();
-
-console.log("DATA:", data);
-
-if (!res.ok) {
-  throw new Error(data.error || "Unknown error");
-}
-
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ displayName }),
     });
+
+    console.log('STATUS:', res.status);
+
     const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error || 'Guest login failed');
+    console.log('DATA:', data);
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Guest login failed');
+    }
 
     sessionStorage.setItem(TOKEN_KEY, data.token);
     setToken(data.token);
     setUser(data.user);
+
     return data.user;
-    }, []);
+  }, []);
 
   const loginWithToken = useCallback((t) => {
     sessionStorage.setItem(TOKEN_KEY, t);
@@ -78,7 +78,16 @@ if (!res.ok) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, loginAsGuest, loginWithToken, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        user,
+        loading,
+        loginAsGuest,
+        loginWithToken,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -86,6 +95,10 @@ if (!res.ok) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+
+  if (!ctx) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+
   return ctx;
 }

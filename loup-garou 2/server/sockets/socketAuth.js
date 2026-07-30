@@ -1,5 +1,5 @@
 const { verifyToken } = require('../config/jwt');
-const User = require('../models/User');
+const User = require('../src/models/User');
 
 module.exports = async function socketAuth(socket, next) {
   try {

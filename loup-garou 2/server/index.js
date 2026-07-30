@@ -15,6 +15,7 @@ const socketAuth = require('./sockets/socketAuth');
 const { registerGameSocket } = require('./sockets/gameSocket');
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 
 // إضافة رابط الـ Frontend الجديد ورابط اللوكال

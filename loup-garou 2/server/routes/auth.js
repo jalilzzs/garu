@@ -45,10 +45,11 @@ router.post('/guest', async (req, res) => {
     });
     const token = signToken(user);
     res.json({ token, user: sanitizeUser(user) });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to create guest session.' });
-  }
-});
+    catch (err) {
+    console.error("Guest error:", err);
+    res.status(500).json({
+    error: err.message
+  });
 
 // ---- Current user ----
 router.get('/me', async (req, res) => {

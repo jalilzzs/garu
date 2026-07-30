@@ -22,8 +22,9 @@ async function findOrCreateOAuthUser({ provider, providerId, displayName, email,
   return user;
 }
 
-passport.use(
-  new GoogleStrategy(
+passpif (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -45,7 +46,8 @@ passport.use(
     }
   )
 );
-
+}
+    
 passport.use(
   new FacebookStrategy(
     {

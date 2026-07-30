@@ -4,7 +4,7 @@ import { Strategy as FacebookStrategy } from 'passport-facebook';
 import { Strategy as AppleStrategy } from 'passport-apple';
 import fs from 'fs';
 
-import User from '../models/User.js';
+import User from '../src/models/User.js';
 
 /**
  * Finds or creates a User document for a given OAuth provider profile.

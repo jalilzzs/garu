@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+ import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 const API_BASE_URL = 'https://loup-garou-kqz6.onrender.com';
 const AuthContext = createContext(null);
@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
     }
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` } });
-      if (!res.ok) throw new Error(data.error || 'Guest login failed');
+      if (!res.ok) throw new Error('session expired');
       const data = await res.json();
       setUser(data.user);
     } catch {
@@ -41,12 +41,14 @@ export function AuthProvider({ children }) {
       body: JSON.stringify({ displayName }),
     });
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Guest login failed');
+
+    if (!res.ok) throw new Error(data.error || 'Guest login failed');
+
     sessionStorage.setItem(TOKEN_KEY, data.token);
     setToken(data.token);
     setUser(data.user);
     return data.user;
-  }, []);
+    }, []);
 
   const loginWithToken = useCallback((t) => {
     sessionStorage.setItem(TOKEN_KEY, t);

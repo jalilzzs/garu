@@ -48,8 +48,9 @@ if(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 );
 }
     
-passport.use(
-  new FacebookStrategy(
+if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
+  passport.use(
+    new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_APP_ID,
       clientSecret: process.env.FACEBOOK_APP_SECRET,
@@ -72,6 +73,7 @@ passport.use(
     }
   )
 );
+}
 
 // Apple strategy only registers if a private key is actually configured,
 // since it requires a .p8 file path that may not exist in dev.

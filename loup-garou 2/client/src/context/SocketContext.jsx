@@ -20,7 +20,7 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    const socket = io('/', { auth: { token }, autoConnect: true });
+       const socket = io('https://loup-garou-kqz6.onrender.com', { auth: { token }, autoConnect: true });
     socketRef.current = socket;
     forceRerender((n) => n + 1);
 

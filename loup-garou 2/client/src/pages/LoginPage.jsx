@@ -18,6 +18,7 @@ export default function LoginPage() {
     setError(null);
     try {
       await loginAsGuest(name);
+      navigate('/');
     } catch (err) {
       setError(err.message);
     } finally {

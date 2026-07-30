@@ -16,14 +16,20 @@ const { registerGameSocket } = require('./sockets/gameSocket');
 
 const app = express();
 const server = http.createServer(app);
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+// إضافة رابط الـ Frontend الجديد ورابط اللوكال
+const ALLOWED_ORIGINS = [
+  'https://loup-garou-dz-exsq.onrender.com',
+  'http://localhost:5173',
+  process.env.CLIENT_URL
+].filter(Boolean);
 
 const io = new Server(server, {
-  cors: { origin: CLIENT_URL, credentials: true },
+  cors: { origin: ALLOWED_ORIGINS, credentials: true },
 });
 
-app.use(helmet());
-app.use(cors({ origin: CLIENT_URL, credentials: true }));
+app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
 app.use(express.json());
 app.use(passport.initialize());
 
@@ -50,9 +56,8 @@ async function start() {
     await mongoose.connect(process.env.MONGO_URL);
     console.log('Connected to MongoDB');
     server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on port ${PORT}`);
-});
-    
+      console.log(`Server listening on port ${PORT}`);
+    });
   } catch (err) {
     console.error('Failed to start server:', err);
     process.exit(1);

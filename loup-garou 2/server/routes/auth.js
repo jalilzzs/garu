@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('../config/passport');
 const { signToken, verifyToken } = require('../config/jwt');
-const User = require('../models/User');
+const User = require('../src/models/User');
 
 const router = express.Router();
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';

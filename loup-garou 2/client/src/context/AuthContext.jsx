@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
+const API_BASE_URL = 'https://loup-garou-kqz6.onrender.com';
 const AuthContext = createContext(null);
 const TOKEN_KEY = 'lg_token';
 
@@ -15,7 +16,7 @@ export function AuthProvider({ children }) {
       return;
     }
     try {
-      const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${t}` } });
+      const res = await fetch(`${API_BASE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` } });
       if (!res.ok) throw new Error('session expired');
       const data = await res.json();
       setUser(data.user);
@@ -33,7 +34,8 @@ export function AuthProvider({ children }) {
   }, [token, fetchMe]);
 
   const loginAsGuest = useCallback(async (displayName) => {
-    const res = await fetch('/api/auth/guest', {
+    const res = await fetch(`${API_BASE_URL}/api/auth/guest`, {
+
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ displayName }),

@@ -77,7 +77,13 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
 
 // Apple strategy only registers if a private key is actually configured,
 // since it requires a .p8 file path that may not exist in dev.
-if (process.env.APPLE_PRIVATE_KEY_PATH && fs.existsSync(process.env.APPLE_PRIVATE_KEY_PATH)) {
+ if (
+  process.env.APPLE_CLIENT_ID &&
+  process.env.APPLE_TEAM_ID &&
+  process.env.APPLE_KEY_ID &&
+  process.env.APPLE_PRIVATE_KEY_PATH &&
+  fs.existsSync(process.env.APPLE_PRIVATE_KEY_PATH)
+) {
   passport.use(
     new AppleStrategy(
       {

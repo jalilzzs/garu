@@ -3,7 +3,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const AppleStrategy = require('passport-apple');
 const fs = require('fs');
-const User = require('../models/User');
+const User = require('../src/models/User');
 
 async function findOrCreateOAuthUser({ provider, providerId, displayName, email, avatarUrl }) {
   let user = await User.findOne({ authProvider: provider, providerId });

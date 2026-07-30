@@ -49,11 +49,22 @@ async function start() {
   try {
     await mongoose.connect(process.env.MONGO_URL);
     console.log('Connected to MongoDB');
-    server.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+    server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+    
   } catch (err) {
     console.error('Failed to start server:', err);
     process.exit(1);
   }
 }
+
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION:', err);
+});
 
 start();

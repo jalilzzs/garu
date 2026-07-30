@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
     }
     try {
       const res = await fetch(`${API_BASE_URL}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` } });
-      if (!res.ok) throw new Error('session expired');
+      if (!res.ok) throw new Error(data.error || 'Guest login failed');
       const data = await res.json();
       setUser(data.user);
     } catch {

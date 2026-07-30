@@ -1,5 +1,5 @@
-const Room = require('../models/Room');
-const Match = require('../models/Match');
+const Room = require('../src/models/Room');
+const Match = require('../src/models/Match');
 const { GameEngine, PHASES, WOLF_ROLES } = require('../game/GameEngine');
 const { recommendComposition, validateComposition } = require('../game/roleBalancer');
 

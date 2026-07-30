@@ -35,6 +35,22 @@ export function AuthProvider({ children }) {
 
   const loginAsGuest = useCallback(async (displayName) => {
     const res = await fetch(`${API_BASE_URL}/api/auth/guest`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ displayName }),
+});
+
+console.log("STATUS:", res.status);
+
+const data = await res.json();
+
+console.log("DATA:", data);
+
+if (!res.ok) {
+  throw new Error(data.error || "Unknown error");
+}
 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -30,7 +30,7 @@ function HomePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch('/api/rooms', {
+      const res = await fetch('https://loup-garou-kqz6.onrender.com/api/rooms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ minPlayers: 4, maxPlayers: 12 }),

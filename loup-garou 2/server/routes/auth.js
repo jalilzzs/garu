@@ -12,25 +12,48 @@ function oauthCallback(req, res) {
 }
 
 // ---- Google ----
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
+router.get(
+  '/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email'],
+    session: false,
+  })
+);
+
 router.get(
   '/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: `${CLIENT_URL}/login?error=google` }),
+  passport.authenticate('google', {
+    session: false,
+    failureRedirect: `${CLIENT_URL}/login?error=google`,
+  }),
   oauthCallback
 );
 
 // ---- Facebook ----
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email'], session: false }));
+router.get(
+  '/facebook',
+  passport.authenticate('facebook', {
+    scope: ['email'],
+    session: false,
+  })
+);
+
 router.get(
   '/facebook/callback',
-  passport.authenticate('facebook', { session: false, failureRedirect: `${CLIENT_URL}/login?error=facebook` }),
+  passport.authenticate('facebook', {
+    session: false,
+    failureRedirect: `${CLIENT_URL}/login?error=facebook`,
+  }),
   oauthCallback
 );
 
 // ---- Apple ----
 router.post(
   '/apple/callback',
-  passport.authenticate('apple', { session: false, failureRedirect: `${CLIENT_URL}/login?error=apple` }),
+  passport.authenticate('apple', {
+    session: false,
+    failureRedirect: `${CLIENT_URL}/login?error=apple`,
+  }),
   oauthCallback
 );
 
@@ -38,31 +61,54 @@ router.post(
 router.post('/guest', async (req, res) => {
   try {
     const { displayName } = req.body;
+
     const user = await User.create({
       authProvider: 'guest',
       isGuest: true,
-      displayName: displayName?.trim().slice(0, 24) || `Guest${Math.floor(Math.random() * 100000)}`,
+      displayName:
+        displayName?.trim().slice(0, 24) ||
+        `Guest${Math.floor(Math.random() * 100000)}`,
     });
+
     const token = signToken(user);
-    res.json({ token, user: sanitizeUser(user) });
-    catch (err) {
-    console.error("Guest error:", err);
+
+    res.json({
+      token,
+      user: sanitizeUser(user),
+    });
+  } catch (err) {
+    console.error('Guest error:', err);
+
     res.status(500).json({
-    error: err.message
-  });
+      error: err.message,
+    });
+  }
+});
 
 // ---- Current user ----
 router.get('/me', async (req, res) => {
   try {
     const authHeader = req.headers.authorization || '';
     const token = authHeader.replace('Bearer ', '');
-    if (!token) return res.status(401).json({ error: 'No token provided.' });
+
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided.' });
+    }
+
     const decoded = verifyToken(token);
     const user = await User.findById(decoded.sub);
-    if (!user) return res.status(404).json({ error: 'User not found.' });
-    res.json({ user: sanitizeUser(user) });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({
+      user: sanitizeUser(user),
+    });
   } catch (err) {
-    res.status(401).json({ error: 'Invalid or expired token.' });
+    res.status(401).json({
+      error: 'Invalid or expired token.',
+    });
   }
 });
 

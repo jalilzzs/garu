@@ -1,7 +1,7 @@
 const express = require('express');
 const requireAuth = require('../middleware/requireAuth');
-const Room = require('../src/models/Room');
-const User = require('../src/models/User');
+const Room = require('../src/models/Room').default;
+const User = require('../src/models/User').default;
 const { recommendComposition, validateComposition } = require('../game/roleBalancer');
 
 const router = express.Router();

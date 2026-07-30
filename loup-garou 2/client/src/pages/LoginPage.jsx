@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext.jsx';
 import { setLanguage } from '../i18n/index.js';
@@ -6,6 +7,7 @@ import { setLanguage } from '../i18n/index.js';
 export default function LoginPage() {
   const { t, i18n } = useTranslation();
   const { loginAsGuest } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);

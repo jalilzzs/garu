@@ -37,8 +37,14 @@ export default function LobbyPage() {
   const fetchRoom = useCallback(async () => {
     const res = await fetch(`/api/rooms/${code}`);
     const data = await res.json();
-    if (data.ok) setRoom(data.room);
-    else setError(data.error);
+
+console.log("ROOM RESPONSE:", data);
+
+if (data.room) {
+  setRoom(data.room);
+} else {
+  setError(data.error || "Room not found");
+}
   }, [code]);
 
   useEffect(() => {
@@ -64,8 +70,11 @@ export default function LobbyPage() {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    if (data.ok) setRoom(data.room);
-    else setError(data.error);
+    if (data.room) {
+  setRoom(data.room);
+} else {
+  setError(data.error || "Join failed");
+}
   }
 
   async function handleRoleCountChange(role, delta) {

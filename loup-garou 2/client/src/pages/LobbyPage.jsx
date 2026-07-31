@@ -38,12 +38,10 @@ export default function LobbyPage() {
     const res = await fetch(`/api/rooms/${code}`);
     const data = await res.json();
 
-console.log("ROOM RESPONSE:", data);
-
-if (data.room) {
+if (res.ok)
   setRoom(data.room);
-} else {
-  setError(data.error || "Room not found");
+else
+  setError(data.error);
 }
   }, [code]);
 
@@ -70,10 +68,10 @@ if (data.room) {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    if (data.room) {
+    if (res.ok)
   setRoom(data.room);
-} else {
-  setError(data.error || "Join failed");
+else
+  setError(data.error);
 }
   }
 
@@ -93,8 +91,10 @@ if (data.room) {
     });
     const data = await res.json();
     setSavingRoles(false);
-    if (data.ok) setRoom(data.room);
-    else setError(data.details?.join(', ') || data.error);
+    if (res.ok)
+  setRoom(data.room);
+else
+  setError(data.details?.join(', ') || data.error);
   }
 
   async function revertToAuto() {
@@ -103,7 +103,8 @@ if (data.room) {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    if (data.ok) setRoom(data.room);
+    if (res.ok)
+  setRoom(data.room);
   }
 
   function startGame() {

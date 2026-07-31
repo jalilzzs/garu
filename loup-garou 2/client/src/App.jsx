@@ -27,23 +27,33 @@ function HomePage() {
   const [error, setError] = useState(null);
 
   async function createRoom() {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await fetch('https://loup-garou-kqz6.onrender.com/api/rooms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ minPlayers: 4, maxPlayers: 12 }),
-      });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.error);
-      navigate(`/lobby/${data.room.code}`);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setBusy(false);
-    }
+  setBusy(true);
+  setError(null);
+
+  try {
+    const res = await fetch("https://loup-garou-kqz6.onrender.com/api/rooms", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        minPlayers: 4,
+        maxPlayers: 12,
+      }),
+    });
+
+    console.log("STATUS:", res.status);
+
+    const text = await res.text();
+    console.log("RESPONSE:", text);
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setBusy(false);
   }
+}
 
   function joinRoom(e) {
     e.preventDefault();

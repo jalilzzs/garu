@@ -20,17 +20,24 @@ router.post('/', async (req, res) => {
     }
 
     const room = await Room.create({
-      hostUserId: user.userId,
+      host: user._id,
       maxPlayers,
+      minPlayers: 4,
       isPrivate,
-      roleConfig: recommendComposition(Math.max(4, Math.min(maxPlayers, 20))),
-      players: [
+
+      roleConfig: recommendComposition(
+        Math.max(4, Math.min(maxPlayers, 20))
+      ),
+
+      seats: [
         {
+          user: user._id,
           userId: user.userId,
           displayName: user.displayName,
-          avatarUrl: user.avatarUrl,
           isHost: true,
           isReady: true,
+          seatIndex: 0,
+          connected: true,
         },
       ],
     });
@@ -40,7 +47,6 @@ router.post('/', async (req, res) => {
     console.error('CREATE ROOM ERROR:', err);
     return res.status(500).json({
       error: err.message,
-      stack: err.stack,
     });
   }
 });
@@ -49,7 +55,7 @@ router.post('/', async (req, res) => {
 router.get('/:roomCode', async (req, res) => {
   try {
     const room = await Room.findOne({
-      roomCode: req.params.roomCode.toUpperCase(),
+      code: req.params.roomCode.toUpperCase(),
     });
 
     if (!room) {
@@ -82,7 +88,7 @@ router.get('/recommend/:playerCount', (req, res) => {
 router.post('/:roomCode/validate-roles', async (req, res) => {
   try {
     const room = await Room.findOne({
-      roomCode: req.params.roomCode.toUpperCase(),
+      code: req.params.roomCode.toUpperCase(),
     });
 
     if (!room) {
@@ -91,7 +97,7 @@ router.post('/:roomCode/validate-roles', async (req, res) => {
 
     const result = validateComposition(
       req.body.roleConfig,
-      room.players.length
+      room.seats.length
     );
 
     res.json(result);

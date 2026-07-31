@@ -35,77 +35,128 @@ export default function LobbyPage() {
   const isHost = room && user && room.host === user.userId;
 
   const fetchRoom = useCallback(async () => {
+  try {
     const res = await fetch(`/api/rooms/${code}`);
     const data = await res.json();
 
-if (res.ok)
-  setRoom(data.room);
-else
-  setError(data.error);
-}
-  }, [code]);
+    if (res.ok) {
+      setRoom(data.room);
+    } else {
+      setError(data.error);
+    }
+  } catch (err) {
+    setError(err.message);
+  }
+}, [code]);
 
-  useEffect(() => {
-    fetchRoom();
-  }, [fetchRoom]);
+useEffect(() => {
+  fetchRoom();
+}, [fetchRoom]);
 
-  useEffect(() => {
-    if (!socket) return;
-    socket.emit('lobby:join', { roomCode: code });
-    const onUpdate = (updatedRoom) => setRoom(updatedRoom);
-    const onStarted = () => navigate(`/game/${code}`);
-    socket.on('lobby:update', onUpdate);
-    socket.on('game:started', onStarted);
-    return () => {
-      socket.off('lobby:update', onUpdate);
-      socket.off('game:started', onStarted);
-    };
-  }, [socket, code, navigate]);
+useEffect(() => {
+  if (!socket) return;
 
-  async function joinRoom() {
+  socket.emit('lobby:join', { roomCode: code });
+
+  const onUpdate = (updatedRoom) => setRoom(updatedRoom);
+  const onStarted = () => navigate(`/game/${code}`);
+
+  socket.on('lobby:update', onUpdate);
+  socket.on('game:started', onStarted);
+
+  return () => {
+    socket.off('lobby:update', onUpdate);
+    socket.off('game:started', onStarted);
+  };
+}, [socket, code, navigate]);
+
+async function joinRoom() {
+  try {
     const res = await fetch(`/api/rooms/${code}/join`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
+
     const data = await res.json();
-    if (res.ok)
-  setRoom(data.room);
-else
-  setError(data.error);
-}
+
+    if (res.ok) {
+      setRoom(data.room);
+    } else {
+      setError(data.error);
+    }
+  } catch (err) {
+    setError(err.message);
   }
+}
 
-  async function handleRoleCountChange(role, delta) {
-    if (!room) return;
-    const current = roleConfigToMap(room.roleConfig);
-    const nextCount = Math.max(0, (current[role] || 0) + delta);
-    const nextConfig = Object.entries({ ...current, [role]: nextCount })
-      .filter(([, c]) => c > 0)
-      .map(([r, c]) => ({ role: r, count: c }));
+async function handleRoleCountChange(role, delta) {
+  if (!room) return;
 
-    setSavingRoles(true);
+  const current = roleConfigToMap(room.roleConfig);
+
+  const nextCount = Math.max(0, (current[role] || 0) + delta);
+
+  const nextConfig = Object.entries({
+    ...current,
+    [role]: nextCount,
+  })
+    .filter(([, c]) => c > 0)
+    .map(([r, c]) => ({
+      role: r,
+      count: c,
+    }));
+
+  setSavingRoles(true);
+
+  try {
     const res = await fetch(`/api/rooms/${code}/roles`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ roleConfig: nextConfig }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        roleConfig: nextConfig,
+      }),
     });
-    const data = await res.json();
-    setSavingRoles(false);
-    if (res.ok)
-  setRoom(data.room);
-else
-  setError(data.details?.join(', ') || data.error);
-  }
 
-  async function revertToAuto() {
+    const data = await res.json();
+
+    setSavingRoles(false);
+
+    if (res.ok) {
+      setRoom(data.room);
+    } else {
+      setError(data.details?.join(', ') || data.error);
+    }
+  } catch (err) {
+    setSavingRoles(false);
+    setError(err.message);
+  }
+}
+
+async function revertToAuto() {
+  try {
     const res = await fetch(`/api/rooms/${code}/roles/auto`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
+
     const data = await res.json();
-    if (res.ok)
-  setRoom(data.room);
+
+    if (res.ok) {
+      setRoom(data.room);
+    } else {
+      setError(data.error);
+    }
+  } catch (err) {
+    setError(err.message);
   }
+}
 
   function startGame() {
     socket.emit('game:start', { roomCode: code }, (ack) => {

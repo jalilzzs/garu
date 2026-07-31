@@ -34,12 +34,21 @@ export default function LobbyPage() {
 
   const isHost = room && user && room.host === user.userId;
 
-  const text = await res.text();
+  const fetchRoom = useCallback(async () => {
+  try {
+    const res = await fetch(`/api/rooms/${code}`);
 
-console.log("STATUS:", res.status);
-console.log("BODY:", text);
+    const text = await res.text();
 
-return;
+    console.log("STATUS:", res.status);
+    console.log("BODY:", text);
+
+    return;
+
+  } catch (err) {
+    setError(err.message);
+  }
+}, [code]);
 
 useEffect(() => {
   fetchRoom();

@@ -43,13 +43,15 @@ function HomePage() {
       }),
     });
 
-    console.log("STATUS:", res.status);
+    const data = await res.json();
 
-    const text = await res.text();
-    console.log("RESPONSE:", text);
+    if (!res.ok) {
+      throw new Error(data.error || "Failed");
+    }
 
+    navigate(`/lobby/${data.room.code}`);
   } catch (err) {
-    console.error(err);
+    setError(err.message);
   } finally {
     setBusy(false);
   }

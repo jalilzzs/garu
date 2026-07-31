@@ -1,117 +1,83 @@
 const ROLE_KEYS = [
   'villageois',
-  'loupGarou',
+  'loup_garou',
   'voyante',
   'sorciere',
   'chasseur',
-  'loupGarouNoir',
+  'loup_garou_noir',
 ];
-
-function emptyComposition() {
-  return ROLE_KEYS.reduce((acc, k) => ({ ...acc, [k]: 0 }), {});
-}
-
-function compositionToArray(comp) {
-  return [
-    { role: 'villageois', count: comp.villageois },
-    { role: 'loup_garou', count: comp.loupGarou },
-    { role: 'voyante', count: comp.voyante },
-    { role: 'sorciere', count: comp.sorciere },
-    { role: 'chasseur', count: comp.chasseur },
-    { role: 'loup_garou_noir', count: comp.loupGarouNoir },
-  ].filter(r => r.count > 0);
-}
 
 function recommendComposition(playerCount) {
   const n = Math.max(4, Math.min(20, playerCount));
-  const comp = emptyComposition();
 
-  let wolfPack = Math.max(1, Math.round(n / 4));
-  wolfPack = Math.min(wolfPack, 6);
+  let wolves = Math.max(1, Math.round(n / 4));
+  wolves = Math.min(wolves, 6);
 
-  const hasVoyante = n >= 5;
-  const hasSorciere = n >= 6;
-  const hasChasseur = n >= 8;
+  const roles = [];
 
-  let loupGarouNoir = 0;
-
-  if (wolfPack >= 2 && n >= 9) {
-    loupGarouNoir = 1;
-    wolfPack--;
+  if (wolves >= 2 && n >= 9) {
+    roles.push({
+      role: 'loup_garou_noir',
+      count: 1,
+    });
+    wolves--;
   }
 
-  comp.loupGarou = wolfPack;
-  comp.loupGarouNoir = loupGarouNoir;
-  comp.voyante = hasVoyante ? 1 : 0;
-  comp.sorciere = hasSorciere ? 1 : 0;
-  comp.chasseur = hasChasseur ? 1 : 0;
+  roles.push({
+    role: 'loup_garou',
+    count: wolves,
+  });
 
-  const totalSpecial =
-    comp.loupGarou +
-    comp.loupGarouNoir +
-    comp.voyante +
-    comp.sorciere +
-    comp.chasseur;
+  if (n >= 5) {
+    roles.push({
+      role: 'voyante',
+      count: 1,
+    });
+  }
 
-  comp.villageois = n - totalSpecial;
+  if (n >= 6) {
+    roles.push({
+      role: 'sorciere',
+      count: 1,
+    });
+  }
 
-  return compositionToArray(comp);
+  if (n >= 8) {
+    roles.push({
+      role: 'chasseur',
+      count: 1,
+    });
+  }
+
+  const used = roles.reduce((s, r) => s + r.count, 0);
+
+  roles.unshift({
+    role: 'villageois',
+    count: n - used,
+  });
+
+  return roles;
 }
 
-function totalRoles(comp) {
-  if (Array.isArray(comp)) {
-    return comp.reduce((sum, r) => sum + r.count, 0);
-  }
-
-  return ROLE_KEYS.reduce((sum, k) => sum + (comp[k] || 0), 0);
+function totalRoles(roleConfig) {
+  return roleConfig.reduce((s, r) => s + r.count, 0);
 }
 
-function validateComposition(comp, playerCount) {
-  if (Array.isArray(comp)) {
-    const obj = {};
-
-    for (const r of comp) {
-      obj[r.role] = r.count;
-    }
-
-    comp = {
-      villageois: obj.villageois || 0,
-      loupGarou: obj.loup_garou || 0,
-      voyante: obj.voyante || 0,
-      sorciere: obj.sorciere || 0,
-      chasseur: obj.chasseur || 0,
-      loupGarouNoir: obj.loup_garou_noir || 0,
-    };
-  }
-
+function validateComposition(roleConfig, playerCount) {
   const errors = [];
-  const total = totalRoles(comp);
 
-  if (total !== playerCount) {
-    errors.push(
-      `Role count (${total}) must equal player count (${playerCount}).`
-    );
+  if (totalRoles(roleConfig) !== playerCount) {
+    errors.push('Invalid role count');
   }
 
-  if ((comp.loupGarou || 0) + (comp.loupGarouNoir || 0) < 1) {
-    errors.push('At least one wolf is required.');
-  }
+  const wolves = roleConfig
+    .filter(
+      r => r.role === 'loup_garou' || r.role === 'loup_garou_noir'
+    )
+    .reduce((s, r) => s + r.count, 0);
 
-  if (
-    (comp.loupGarou || 0) + (comp.loupGarouNoir || 0) >= playerCount
-  ) {
-    errors.push('Too many wolves.');
-  }
-
-  for (const key of [
-    'voyante',
-    'sorciere',
-    'chasseur',
-    'loupGarouNoir',
-  ]) {
-    if ((comp[key] || 0) > 1) {
-      errors.push(`Only one ${key} allowed.`);
-    }
+  if (wolves < 1) {
+    errors.push('At least one wolf required');
   }
 
   return {
@@ -121,4 +87,8 @@ function validateComposition(comp, playerCount) {
 }
 
 module.exports = {
-  ROLE_KEYS
+  ROLE_KEYS,
+  recommendComposition,
+  validateComposition,
+  totalRoles,
+};
